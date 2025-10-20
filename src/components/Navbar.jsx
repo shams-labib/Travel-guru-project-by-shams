@@ -1,18 +1,31 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import logo from '../assets/images/logo.png'
-import { NavLink } from 'react-router';
+import { Link, NavLink } from 'react-router';
+import { AuthContext } from '../Firebase/AuthContext/AuthContext';
+import { FaUser } from 'react-icons/fa';
+import { toast } from 'react-toastify';
 
 const Navbar = () => {
 
+  const {user, signInOut} = useContext(AuthContext);
+
+  const handleSignOut = ()=>{
+         signInOut().then(
+          toast.success("Log Out Success")
+         ).catch(err => {
+          toast.error(err.message)
+         })
+  }
+
     const links = <>
-    <NavLink>News</NavLink>
+    <NavLink to={'/'}>Home</NavLink>
     <NavLink>Destination</NavLink>
     <NavLink>Blog</NavLink>
     <NavLink>Contact</NavLink>
     </>
 
     return (
-        <div className=" flex justify-around  items-center py-3">
+        <div className=" flex justify-between  items-center py-3">
   <div className="start">
     <div className="dropdown">
       <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
@@ -20,16 +33,8 @@ const Navbar = () => {
       </div>
       <ul
         tabIndex="-1"
-        className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
-        <li><a>Item 1</a></li>
-        <li>
-          <a>Parent</a>
-          <ul className="p-2">
-            <li><a>Submenu 1</a></li>
-            <li><a>Submenu 2</a></li>
-          </ul>
-        </li>
-        <li><a>Item 3</a></li>
+        className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52  shadow">
+        {links}
       </ul>
     </div>
    <div className=''>
@@ -62,7 +67,29 @@ const Navbar = () => {
     </ul>
   </div>
   <div className="end-btn">
-    <a className="btn text-white bg-[#F9A51A] px-7 border-none">LogIn</a>
+   {
+    user ? <div className='flex gap-3 items-center'>
+      <div>
+        {user.photoURL
+  ? <img src={user.photoURL} alt="User" className="w-10 h-10 rounded-full" />
+  : <FaUser size={30} />
+}
+
+      </div>
+      <div>
+      <button className="btn" popoverTarget="popover-1" style={{ anchorName: "--anchor-1" } /* as React.CSSProperties */}>
+  Account
+</button>
+
+<ul className="dropdown menu w-52 rounded-box bg-base-100 shadow-sm"
+  popover="auto" id="popover-1" style={{ positionAnchor: "--anchor-1" } /* as React.CSSProperties */ }>
+  <li><a className='font-semibold'>{user ? user.displayName : ""}</a></li>
+  <li><a className='font-semibold'>{user ? user.email : ''}</a></li>
+  <button onClick={handleSignOut} className='px-3 py-2 text-white rounded-lg cursor-pointer shadow-sm transition-transform duration-300 hover:-translate-y-0.5 bg-blue-300'>LogOut</button>
+</ul>
+    </div>
+    </div> :  <Link to={'/auth/login'} className="btn text-white bg-[#F9A51A] px-7 border-none">LogIn</Link>
+   }
   </div>
 </div>
     );
